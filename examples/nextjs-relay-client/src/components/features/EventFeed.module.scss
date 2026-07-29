@@ -1,0 +1,71 @@
+@import '@/styles/variables';
+@import '@/styles/mixins';
+
+.container {
+  @include card-base;
+  max-height: 80vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+
+  // Custom scrollbar sci-fi
+  &::-webkit-scrollbar { width: 6px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb { background: $color-accent-primary; border-radius: 3px; }
+}
+
+.row {
+  padding: 1rem;
+  border-left: 3px solid transparent;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 6px;
+  transition: border-color 0.2s;
+
+  &:hover { border-left-color: $color-accent-primary; }
+
+  &.system { border-left-color: $color-accent-warning; }
+  &.media { border-left-color: $color-accent-success; }
+}
+
+.meta {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.kind {
+  font-family: monospace;
+  font-size: 0.75rem;
+  color: $color-accent-primary;
+  background: rgba(59, 130, 246, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.time {
+  font-size: 0.75rem;
+  color: $color-text-secondary;
+}
+
+.content {
+  color: $color-text-primary;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.mediaGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.mediaThumb {
+  width: 100%;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid rgba(255,255,255,0.1);
+}
