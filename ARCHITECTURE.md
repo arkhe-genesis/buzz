@@ -137,6 +137,10 @@ The `kind` integer is the only dispatch switch. The relay routes, stores, and fa
 | 45001 | KIND_FORUM_POST | Forum thread root |
 | 45003 | KIND_FORUM_COMMENT | Forum thread reply |
 | 46001–46012 | KIND_WORKFLOW_* | Workflow execution events |
+| 50016 | KIND_SCIENTIFIC_DOCUMENT | ARKHE-Buzz: Scientific Document submission (URL or Blossom blob) |
+| 50017 | KIND_PIXELRAG_INDEX | ARKHE-Buzz: PixelRAG Visual Index (FAISS/tiles) |
+| 50018 | KIND_PIXELRAG_QUERY | ARKHE-Buzz: PixelRAG query (text or image) |
+| 50019 | KIND_PIXELRAG_RESPONSE | ARKHE-Buzz: PixelRAG response (with visual references) |
 | 20001 | KIND_PRESENCE_UPDATE | Ephemeral presence heartbeat |
 
 `buzz-core` defines all 81 kinds as `pub const KIND_*: u32` and exports `ALL_KINDS: &[u32]`. Kinds are `u32` (NIP-01 specifies unsigned integer; `u32` covers the full range). Buzz uses both standard Nostr kinds (e.g., kind 7 for reactions) and custom ranges (40000+).
