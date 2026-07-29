@@ -465,6 +465,16 @@ pub const KIND_HUDDLE_GUIDELINES: u32 = 48106;
 /// Internal kind for media upload audit entries. Not a relay event kind.
 pub const KIND_MEDIA_UPLOAD: u32 = 49001;
 
+// PixelRAG / Visual RAG (50000–50999)
+/// ARKHE-Buzz: Scientific Document submission (URL or Blossom blob).
+pub const KIND_SCIENTIFIC_DOCUMENT: u32 = 50016;
+/// ARKHE-Buzz: PixelRAG Visual Index (FAISS/tiles).
+pub const KIND_PIXELRAG_INDEX: u32 = 50017;
+/// ARKHE-Buzz: PixelRAG query (text or image).
+pub const KIND_PIXELRAG_QUERY: u32 = 50018;
+/// ARKHE-Buzz: PixelRAG response (with visual references).
+pub const KIND_PIXELRAG_RESPONSE: u32 = 50019;
+
 /// NIP-34: Repository announcement (parameterized replaceable, d-tag = repo-id).
 pub const KIND_GIT_REPO_ANNOUNCEMENT: u32 = 30617;
 /// NIP-34: Repository state — current branch/tag refs (parameterized replaceable, d-tag = repo-id).
@@ -605,6 +615,10 @@ pub const ALL_KINDS: &[u32] = &[
     KIND_HUDDLE_ENDED,
     KIND_HUDDLE_GUIDELINES,
     KIND_MEDIA_UPLOAD,
+    KIND_SCIENTIFIC_DOCUMENT,
+    KIND_PIXELRAG_INDEX,
+    KIND_PIXELRAG_QUERY,
+    KIND_PIXELRAG_RESPONSE,
     KIND_GIT_REPO_ANNOUNCEMENT,
     KIND_GIT_REPO_STATE,
     KIND_GIT_PATCH,
