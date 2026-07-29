@@ -1,0 +1,13 @@
+name = "CathedralArkhe"
+version = "0.1.0"
+defaultTargets = ["cathedralarkhe"]
+
+[[lean_lib]]
+name = "CathedralArkhe"
+
+[[lean_exe]]
+name = "cathedralarkhe"
+
+[[require]]
+name = "mathlib"
+git = "https://github.com/leanprover-community/mathlib4"
