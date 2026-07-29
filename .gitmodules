@@ -1,0 +1,3 @@
+[submodule "buzz_repo"]
+	path = buzz_repo
+	url = https://github.com/block/buzz
