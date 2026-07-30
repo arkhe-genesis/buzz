@@ -1,12 +1,13 @@
 name = "CathedralArkhe"
 version = "0.1.0"
-defaultTargets = ["cathedralarkhe"]
+defaultTargets = ["CathedralArkhe"]
 
 [[lean_lib]]
 name = "CathedralArkhe"
 
 [[lean_exe]]
 name = "cathedralarkhe"
+root = "Main"
 
 [[require]]
 name = "mathlib"
