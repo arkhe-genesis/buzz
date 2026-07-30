@@ -1,0 +1,14 @@
+[workspace]
+[package]
+name = "cathedral-radio-stack"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+embedded-hal = "1.0.0"
+cortex-m = "0.7"
+cortex-m-rt = "0.7"
+freertos-rust = "0.2.0"
+rumqttc = "0.24.0"
+serde_json = "1.0"
+serde = { version = "1.0", features = ["derive"] }
