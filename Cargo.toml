@@ -1,6 +1,7 @@
 [workspace]
 members = [
     "crates/buzz-relay",
+    "crates/arkhe-soc-tlm",
     "crates/buzz-core",
     "crates/buzz-conformance",
     "crates/buzz-push-gateway",
