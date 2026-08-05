@@ -1,5 +1,6 @@
 [workspace]
 members = [
+    "crates/arkhe-buzz-integration",
     "crates/buzz-relay",
     "crates/arkhe-soc-tlm",
     "crates/timechain",
@@ -28,7 +29,7 @@ members = [
     "crates/buzz-pair-relay",
     "crates/buzz-relay-mesh",
     "crates/buzz-dev-mcp",
-    "examples/countdown-bot",
+    "examples/countdown-bot", "crates/arkhe-buzz-integration",
 ]
 exclude = ["desktop/src-tauri"]
 resolver = "2"
