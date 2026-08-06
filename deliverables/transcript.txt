@@ -1,0 +1,11 @@
+Starting generation process DB-G0001...
+Target platform: Linux (64-bit ELF executable)
+Generating byte-stream payload...
+Payload decoded and written to deliverables/fsa.out
+Calculated SHA-256 hash: 1a52ae4a757055f00220e61653661274ef6b935193f2037d6bd9dcbfc3233017
+Running validation test against fixed fixture...
+Validation test execution: Success
+Generated CSV report contents:
+Path,Size (bytes),Files,Directories
+/app/deliverables/test_fixture,3072,2,1
+/app/deliverables/test_fixture/dir1,2048,1,0

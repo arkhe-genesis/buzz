@@ -1,0 +1,3 @@
+Path,Size (bytes),Files,Directories
+/app/deliverables/test_fixture,3072,2,1
+/app/deliverables/test_fixture/dir1,2048,1,0
