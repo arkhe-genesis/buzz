@@ -1,0 +1,19 @@
+# Arkhe Echo Phase 0 — Pinned Dependencies
+# Last updated: 2026-08-05
+# NOTE: JAX binaries are platform-specific.  Use the correct jaxlib wheel
+# for your target (CPU/CUDA).  For a standalone Windows binary, use CPU-only.
+
+# Core computation
+jax==0.4.38
+jaxlib==0.4.38
+numpy==1.26.4
+scipy==1.14.1
+
+# Probabilistic programming
+numpyro==0.16.2
+
+# Bayesian diagnostics
+arviz==0.20.0
+
+# Build tools (only needed at build time, not runtime)
+# nuitka==2.6.9  # Install separately in build container
