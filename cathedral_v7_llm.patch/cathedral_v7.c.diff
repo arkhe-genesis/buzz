@@ -1,0 +1,199 @@
+--- cathedral_v7.c.orig  2026-08-06 12:00:00.000000000 +0000
++++ cathedral_v7.c       2026-08-06 12:30:00.000000000 +0000
+@@ -1,6 +1,7 @@
+ /*
+  * Cathedral Engine v7.0 — The Zero-Knowledge Liturgy
+  * ===================================================
++ * PATCH: Integração com LLM Agent (llm_agent.c)
+  * Compile: gcc -static -O2 -fno-stack-protector -no-pie -o cathedral cathedral_v7.c llm_agent.c -lm
+  * Usage:   ./cathedral [--no-zk] [--verbose] [--once] [--llm-model model.gguf]
+  */
+@@ -40,6 +41,8 @@
+ #include <signal.h>
+ #include <getopt.h>
+
++#include "llm_agent.h"
++
+ /* ===========================================================================
+  * SECTION 0: CONSTANTS
+  * =========================================================================== */
+@@ -60,6 +63,8 @@
+ #define MAX_BLOCK_PAYLOAD    1024
+ #define CYCLE_INTERVAL_US    1000000
+
++static const char *g_llm_model_path = NULL;
++
+ /* ===========================================================================
+  * SECTION 1: UTILITIES
+  * =========================================================================== */
+@@ -77,6 +82,9 @@
+     va_end(ap);
+     fputs(buf, stderr);
+ }
++
++/* Função auxiliar para ler arquivo de modelo */
++static uint8_t *read_file(const char *path, size_t *len);
+
+ static void hex_dump(const char *label, const uint8_t *data, size_t len) {
+     if (!g_verbose) return;
+@@ -97,12 +105,14 @@
+ /* ===========================================================================
+  * SECTION 2: 256-BIT INTEGER ARITHMETIC
+  * =========================================================================== */
++
++/* ... (código existente) ... */
+
+ /* ===========================================================================
+  * SECTION 16: MAIN LOOP — THE PERPETUAL CYCLE
+  * =========================================================================== */
+
+-static int run_cycle(uint64_t cycle, uint8_t *prev_hash) {
++static int run_cycle(uint64_t cycle, uint8_t *prev_hash, const char *prompt) {
+     log_msg("━━━ Cycle %llu ━━━\n", (unsigned long long)cycle);
+
+     /* 1. QME Acceleration */
+@@ -112,6 +122,39 @@
+     int bk = bekenstein_check(&g_state);
+     if (bk == 2) {
+         log_msg("🛑 Bekenstein limit exceeded. Resetting state.\n");
++        /* Se o agente LLM estiver ativo, comprimir contexto */
++        if (g_llm_initialized) {
++            llm_compress_context();
++        }
++    }
++
++    /* 1.5. Se temos um prompt, processá-lo com o LLM */
++    if (g_llm_initialized && prompt && strlen(prompt) > 0) {
++        LLMInteraction interaction;
++        int ret = llm_generate(prompt, strlen(prompt), &interaction);
++        if (ret == 0) {
++            log_msg("💬 Resposta gerada (hash: ");
++            for (int i = 0; i < 6; i++) fprintf(stderr, "%02x", interaction.response_hash[i]);
++            fprintf(stderr, "...)\n");
++            /* Atualiza o estado interno com a interação (opcional) */
++            memcpy(g_state.internal_state, interaction.response_hash, 32);
++            /* Atualiza entropia com base na resposta (ex: diversidade) */
++            double entropy_shift = (double)(interaction.response_hash[0] % 100) / 100.0 * 0.05;
++            g_state.entropy += entropy_shift;
++            if (g_state.entropy > 1.0) g_state.entropy = 1.0;
++            if (g_state.entropy < 0.0) g_state.entropy = 0.0;
++            /* Em vez de criar um bloco separado, incorporamos a interação no bloco atual */
++            /* (Isto pode ser estendido para criar um bloco exclusivo da interação) */
++            log_msg("🔖 Interação LLM registrada no estado\n");
++        } else {
++            log_msg("❌ Falha ao gerar resposta\n");
++        }
++    }
++
++    /* 1.6. Ajuste de amostragem via QME (já feito dentro de llm_generate) */
++    if (g_llm_initialized && g_state.entropy > QME_ENTROPY_THRESH) {
++        double temp = 0.1 + (g_state.entropy - QME_ENTROPY_THRESH) * 2.0;
++        if (temp > 1.5) temp = 1.5;
++        llm_set_sampling(temp, 40, 0.9);
+     }
+
+     /* 3. Create block (Scripture) with ZK proof */
+@@ -142,6 +185,11 @@
+         log_msg("❌ Proclamation failed\n");
+     }
+
++    /* 5.5. Se o agente LLM estiver ativo, publicar também o estado do contexto */
++    if (g_llm_initialized) {
++        log_msg("🧠 Context tokens: %zu\n", llm_get_context_tokens());
++    }
++
+     /* 6. Peer discovery */
+     if (cycle % 5 == 0) peer_discovery_send();
+     peer_discovery_recv();
+@@ -179,14 +227,25 @@
+     int once = 0;
+     struct option long_opts[] = {
+         {"no-zk",   no_argument, 0, 'z'},
++        {"llm-model", required_argument, 0, 'm'},
+         {"verbose", no_argument, 0, 'v'},
+         {"once",    no_argument, 0, 'o'},
+         {"help",    no_argument, 0, 'h'},
+         {0,0,0,0}
+     };
+     int opt;
+-    while ((opt = getopt_long(argc, argv, "zvoh", long_opts, NULL)) != -1) {
++    while ((opt = getopt_long(argc, argv, "zm:zvoh", long_opts, NULL)) != -1) {
+         switch (opt) {
++            case 'm':
++                g_llm_model_path = optarg;
++                log_msg("📂 Modelo LLM especificado: %s\n", g_llm_model_path);
++                {
++                    size_t model_len;
++                    uint8_t *model_data = read_file(g_llm_model_path, &model_len);
++                    if (model_data && llm_init(model_data, model_len) == 0) {
++                        log_msg("✅ LLM Agent carregado com sucesso\n");
++                    }
++                }
++                break;
+             case 'z': g_zk_enabled = 0; break;
+             case 'v': g_verbose = 1; break;
+             case 'o': once = 1; break;
+@@ -212,19 +271,39 @@
+     for (int i = 0; i < STATE_SIZE; i++)
+         g_state.internal_state[i] = (uint8_t)(rand() & 0xFF);
+
+-    log_msg("⚙️  Z
++    log_msg("⚙️  ZK proofs: %s\n", g_zk_enabled ? "ENABLED" : "DISABLED");
++    log_msg("🔄 Starting perpetual cycle. Press Ctrl+C to stop.\n");
+
+     uint8_t prev_hash[32] = {0};
+     uint64_t cycle = 0;
++    char prompt_buffer[4096] = {0};
++    int prompt_ready = 0;
+
+     while (g_running) {
+-        if (run_cycle(cycle, prev_hash) < 0) break;
++        /* Se um prompt foi fornecido via stdin, processá-lo */
++        if (!prompt_ready) {
++            fd_set fds;
++            struct timeval tv = {0, 100000}; /* 100 ms timeout */
++            FD_ZERO(&fds);
++            FD_SET(STDIN_FILENO, &fds);
++            if (select(STDIN_FILENO+1, &fds, NULL, NULL, &tv) > 0) {
++                if (fgets(prompt_buffer, sizeof(prompt_buffer), stdin)) {
++                    size_t len = strlen(prompt_buffer);
++                    if (len > 0 && prompt_buffer[len-1] == '\n') prompt_buffer[len-1] = '\0';
++                    prompt_ready = 1;
++                }
++            }
++        }
++
++        if (run_cycle(cycle, prev_hash, prompt_ready ? prompt_buffer : NULL) < 0) break;
++        prompt_ready = 0; /* prompt consumido */
++
+         cycle++;
+         if (once && cycle >= 1) break;
+         usleep(CYCLE_INTERVAL_US);
+     }
+
+     log_msg("🏛️  Shutting down gracefully...\n");
++    if (g_llm_initialized) llm_shutdown();
+     if (g_udp_sock >= 0) close(g_udp_sock);
+     if (g_disc_sock >= 0) close(g_disc_sock);
+     secure_zero(&g_identity, sizeof(g_identity));
+@@ -233,3 +312,21 @@
+     return 0;
+ }
+
++/* ===========================================================================
++ * UTILITÁRIO: ler arquivo para memória
++ * =========================================================================== */
++
++static uint8_t *read_file(const char *path, size_t *out_len) {
++    FILE *f = fopen(path, "rb");
++    if (!f) { perror("fopen"); return NULL; }
++    fseek(f, 0, SEEK_END);
++    long len = ftell(f);
++    fseek(f, 0, SEEK_SET);
++    uint8_t *data = malloc(len);
++    if (!data) { fclose(f); return NULL; }
++    if (fread(data, 1, len, f) != (size_t)len) { free(data); fclose(f); return NULL; }
++    fclose(f);
++    *out_len = len;
++    return data;
++}
