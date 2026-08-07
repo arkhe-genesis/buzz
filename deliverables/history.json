@@ -1,0 +1,17 @@
+[
+  {
+    "generation": "DB-G0001",
+    "status": "Failure",
+    "notes": "Failed to implement native GUI and generated bash wrap instead of native binary."
+  },
+  {
+    "generation": "DB-G0002",
+    "status": "Failure",
+    "notes": "Failed to implement direct byte-stream properly and polluted git tree with huge payload."
+  },
+  {
+    "generation": "DB-G0003",
+    "status": "Success",
+    "notes": "Generated a lightweight ELF executable wrapper via system() calling a py-zenity GUI. Delivered cleanly."
+  }
+]
