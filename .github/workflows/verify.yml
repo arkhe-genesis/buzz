@@ -24,7 +24,7 @@ jobs:
       - name: Run Kani verification
         run: |
           cd arkhe-safe-sail
-          cargo kani
+          cargo kani -Z function-contracts
       - name: Upload verification report
         if: always()
         uses: actions/upload-artifact@v4
