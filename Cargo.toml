@@ -1,6 +1,7 @@
 [workspace]
 members = [
     "crates/arkhe-buzz-integration",
+    "crates/arkhe-quantum-auth",
     "crates/buzz-relay",
     "crates/arkhe-soc-tlm",
     "crates/timechain",
@@ -30,6 +31,7 @@ members = [
     "crates/buzz-relay-mesh",
     "crates/buzz-dev-mcp",
     "examples/countdown-bot", "crates/arkhe-buzz-integration",
+    "crates/arkhe-quantum-auth",
 ]
 exclude = ["desktop/src-tauri"]
 resolver = "2"

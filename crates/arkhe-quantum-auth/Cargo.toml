@@ -1,0 +1,77 @@
+[package]
+name = "arkhe-quantum-auth"
+version = "0.1.0"
+edition = "2021"
+authors = ["Arkhe OS Team"]
+description = "Fast/Slow Path Authentication for Quantum Repeater Links"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/arkhe-os/arkhe-quantum-auth"
+keywords = ["quantum", "cryptography", "post-quantum", "no-std", "authentication"]
+categories = ["cryptography", "no-std"]
+rust-version = "1.75"
+
+[features]
+default = ["std"]
+std = [
+    "alloc",
+    "aes-gcm-siv/std",
+    "rand/std",
+    "rand/std_rng",
+    "rand_core/std",
+    "pqcrypto-dilithium/std",
+    "pqcrypto-kyber/std",
+]
+alloc = []
+# no_std production build: disable std, enable alloc + heapless AEAD
+no_std = ["alloc", "aes-gcm-siv/heapless", "aes-gcm-siv/aes"]
+# Integration with Arkhe workspace crates
+arkhe-pea = [] # removed dep:arkhe-pea for now, we will add it manually
+arkhe-core = []
+# Hardware acceleration for x86_64 AES-NI
+hwaccel = ["aes-gcm-siv/aes"]
+
+[dependencies]
+# --- Core cryptography (no_std compatible) ---
+hkdf = { version = "0.12", default-features = false }
+sha3 = { version = "0.10", default-features = false }
+digest = { version = "0.10", default-features = false }
+aes-gcm-siv = { version = "0.11", default-features = false }
+aead = { version = "0.5", default-features = false }
+
+# --- Post-quantum cryptography ---
+# NOTE: pqcrypto-dilithium provides Dilithium3, API-equivalent to ML-DSA-65.
+# Replace with pqcrypto-ml-dsa when published to crates.io.
+pqcrypto-dilithium = { version = "0.5", default-features = false }
+pqcrypto-kyber = { version = "0.7", default-features = false }
+pqcrypto-traits = { version = "0.3", default-features = false }
+
+# --- Classical ECC for X-Wing hybrid ---
+x25519-dalek = { version = "2.0", default-features = false, features = ["static_secrets", "zeroize", "precomputed-tables"] }
+curve25519-dalek = { version = "4.1", default-features = false, features = ["zeroize"] }
+
+# --- Randomness (no_std) ---
+rand_core = { version = "0.6", default-features = false }
+rand = { version = "0.8", default-features = false, optional = true }
+
+# --- Hashing & utilities ---
+blake3 = { version = "1.5", default-features = false }
+zeroize = { version = "1.8", default-features = false, features = ["derive", "alloc"] }
+
+# --- Logging (no_std via defmt or log) ---
+log = { version = "0.4", default-features = false }
+
+# --- Arkhe workspace integration (optional) ---
+# We will add arkhe dependencies here
+
+[dev-dependencies]
+rand = { version = "0.8", features = ["std", "std_rng"] }
+hex = { version = "0.4", default-features = false, features = ["alloc"] }
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+panic = "abort"
+
+[profile.dev]
+opt-level = 1
