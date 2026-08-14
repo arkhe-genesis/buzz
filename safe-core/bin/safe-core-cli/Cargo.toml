@@ -1,0 +1,23 @@
+[package]
+name = "safe-core-cli"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+readme.workspace = true
+description = "CLI para o SAFE-CORE OS"
+
+[dependencies]
+# Dependências internas
+safe-core-core = { path = "../../crates/safe-core-core" }
+safe-core-identity = { path = "../../crates/safe-core-identity" }
+safe-core-governance = { path = "../../crates/safe-core-governance" }
+safe-core-pea = { path = "../../crates/safe-core-pea" }
+safe-core-inference = { path = "../../crates/safe-core-inference" }
+safe-core-mcp-adapter = { path = "../../crates/safe-core-mcp-adapter" }
+
+# Dependências externas
+clap = { workspace = true }
+tracing = { workspace = true }
+anyhow = { workspace = true }
