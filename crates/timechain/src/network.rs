@@ -1,5 +1,4 @@
 use tokio::net::UdpSocket;
-use tokio::time::{sleep, Duration};
 use std::collections::HashMap;
 use std::net::SocketAddr;
 use serde::{Serialize, Deserialize};
@@ -8,7 +7,7 @@ use crate::{EchoSignal, TimeBlock, PlasmaConfig, EvoField};
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum NetworkMessage {
     Heartbeat { node_id: u64, field_hash: [u8; 32], phase_time: f64 },
-    Echo { echo: EchoSignal, block: TimeBlock },
+    Echo { echo: EchoSignal, block: Box<TimeBlock> },
     BlockRequest { height: u64 },
 }
 
@@ -24,9 +23,12 @@ impl PeerInfo {
 
 pub struct P2PNode {
     socket: UdpSocket,
+    #[allow(dead_code)]
     node_id: u64,
     peers: HashMap<SocketAddr, PeerInfo>,
+    #[allow(dead_code)]
     config: PlasmaConfig,
+    #[allow(dead_code)]
     field: EvoField,
 }
 
@@ -39,11 +41,11 @@ impl P2PNode {
     }
 
     pub async fn broadcast_echo(&self, echo: EchoSignal, block: TimeBlock) {
-        let packet = NetworkMessage::Echo { echo: echo.clone(), block };
+        let packet = NetworkMessage::Echo { echo: echo.clone(), block: Box::new(block) };
         let serialized = bincode::serialize(&packet).unwrap();
 
         for (peer_addr, _info) in self.peers.iter() {
-            let delay = 0.1; // Placeholder for frequency-based delay
+            let _delay = 0.1; // Placeholder for frequency-based delay
             let data = serialized.clone();
             let target = *peer_addr;
             // Simplified broadcast for simulation purposes
@@ -63,7 +65,7 @@ impl P2PNode {
     async fn handle_message(&mut self, msg: NetworkMessage, src: SocketAddr) {
         match msg {
             NetworkMessage::Echo { echo, block } => {
-                self.process_echo(echo, block).await;
+                self.process_echo(echo, *block).await;
             }
             NetworkMessage::Heartbeat { node_id, field_hash: _, phase_time: _ } => {
                 self.peers.entry(src).or_insert(PeerInfo::new(node_id));

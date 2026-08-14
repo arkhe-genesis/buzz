@@ -1,5 +1,4 @@
 use ::timechain::*;
-use ndarray::prelude::*;
 use ndarray_linalg::*;
 
 #[test]

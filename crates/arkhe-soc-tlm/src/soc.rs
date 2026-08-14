@@ -1,5 +1,5 @@
 use crate::{
-    aotb::{AotbEncoderHw, AotbVerifierHw}, AotbFrame, ClockDomain, DOMAIN_NODES, PerformanceCounters,
+    aotb::AotbEncoderHw, AotbFrame, ClockDomain, DOMAIN_NODES, PerformanceCounters,
     power::PowerDomain, qpl::QplAccelerator, QplResult, sram::SramDxController,
 };
 
