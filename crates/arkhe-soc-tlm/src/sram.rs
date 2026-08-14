@@ -92,7 +92,7 @@ impl ArkhePeripheral for SramDxController {
         }
     }
 
-    fn write_reg(&mut self, addr: u32, val: u32) -> Result<(), SocError> {
+    fn write_reg(&mut self, addr: u32, _val: u32) -> Result<(), SocError> {
         match addr {
             0x10 => {
                 // Trigger swap manual (debug)

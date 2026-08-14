@@ -50,13 +50,13 @@ impl PolicyEngine {
         self.current_pressure
     }
 
-    pub fn process_metrics(&mut self, metrics: &SecurityMetrics) -> Result<(), ()> {
+    pub fn process_metrics(&mut self, metrics: &SecurityMetrics) -> Result<(), &'static str> {
         let p = metrics.pressure();
         if p <= self.max_pressure {
             self.current_pressure = p;
             Ok(())
         } else {
-            Err(())
+            Err("Metrics exceeded maximum pressure")
         }
     }
 }
