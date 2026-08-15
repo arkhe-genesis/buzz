@@ -80,7 +80,7 @@ impl PerformanceCounters {
 pub struct ClockDomain {
     pub freq_mhz: u32,
     cycle_count: AtomicU64,
-    epoch: Instant,
+    _epoch: Instant,
 }
 
 impl ClockDomain {
@@ -88,7 +88,7 @@ impl ClockDomain {
         Self {
             freq_mhz,
             cycle_count: AtomicU64::new(0),
-            epoch: Instant::now(),
+            _epoch: Instant::now(),
         }
     }
 

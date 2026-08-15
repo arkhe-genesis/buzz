@@ -1,3 +1,4 @@
+#![allow(missing_docs)]
 //! Slow Path: bootstrap, key rotation, and bundle attestation.
 
 use alloc::vec::Vec;

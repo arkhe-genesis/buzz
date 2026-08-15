@@ -9,7 +9,7 @@ pub struct SramDxController {
     bank_x: [[u8; 8]; FULL_NODES],  // 16 vértices expandidos
     active: BufferId,
     ready_sequence: AtomicU64,
-    clock: ClockDomain,
+    _clock: ClockDomain,
 }
 
 impl SramDxController {
@@ -19,7 +19,7 @@ impl SramDxController {
             bank_x: [[0u8; 8]; FULL_NODES],
             active: BufferId::Domain,
             ready_sequence: AtomicU64::new(0),
-            clock,
+            _clock: clock,
         }
     }
 
@@ -54,10 +54,10 @@ impl SramDxController {
         // 1 ciclo por vértice no TLM (no RTL seria combinational)
         let mut cycles = 0u64;
 
-        for i in 0..DOMAIN_NODES {
+        for (i, weight) in weights.iter().enumerate().take(DOMAIN_NODES) {
             let base = f64::from_be_bytes(self.bank_d[i]);
             let neighbor = f64::from_be_bytes(self.bank_d[(i + 1) % DOMAIN_NODES]);
-            let weight = f64::from(weights[i]) / 100.0;
+            let weight = f64::from(*weight) / 100.0;
             let expanded = weight * base + (1.0 - weight) * neighbor;
 
             self.bank_x[i] = self.bank_d[i]; // inclusão direta (bandIso toFun)
@@ -92,7 +92,7 @@ impl ArkhePeripheral for SramDxController {
         }
     }
 
-    fn write_reg(&mut self, addr: u32, val: u32) -> Result<(), SocError> {
+    fn write_reg(&mut self, addr: u32, _val: u32) -> Result<(), SocError> {
         match addr {
             0x10 => {
                 // Trigger swap manual (debug)

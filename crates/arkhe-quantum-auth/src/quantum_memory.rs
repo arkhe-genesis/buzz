@@ -1,3 +1,4 @@
+#![allow(missing_docs)]
 //! Quantum Memory Controller Interface.
 
 use crate::error::AuthResult;

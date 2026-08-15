@@ -1,6 +1,6 @@
 use arkhe_soc_tlm::{
     aotb::{AotbEncoderHw, AotbVerifierHw},
-    micros, soc::ArkheSoc, ClockDomain, DOMAIN_NODES, PerformanceCounters, REFERENCE_SOL_US,
+    micros, soc::ArkheSoc, ClockDomain, PerformanceCounters, REFERENCE_SOL_US,
 };
 use ed25519_dalek::SigningKey;
 use serde::Serialize;
@@ -66,7 +66,7 @@ fn main() {
 
     let wall_time_us = wall_elapsed.as_secs_f64() * 1_000_000.0;
     let per_iter_us = wall_time_us / iterations as f64;
-    let overhead = ((per_iter_us / REFERENCE_SOL_US) - 1.0) * 100.0;
+    let _overhead_wall = ((per_iter_us / REFERENCE_SOL_US) - 1.0) * 100.0;
 
     // A latência real da simulação agora é: (2.37us + 0.1us = 2.47us por iteração).
     // The previous math was using wall clock time to calculate overhead for simulated
