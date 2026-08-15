@@ -57,12 +57,12 @@ impl QplAccelerator {
             output: 0.0,
         }; DOMAIN_NODES];
 
-        for i in 0..DOMAIN_NODES {
+        for (i, result) in results.iter_mut().enumerate().take(DOMAIN_NODES) {
             let input = sram.read_domain_d(i as u8)?;
             let left = sram.read_domain_d(((i + DOMAIN_NODES - 1) % DOMAIN_NODES) as u8)?;
             let right = sram.read_domain_d(((i + 1) % DOMAIN_NODES) as u8)?;
             let output = (left + input + right) / 3.0;
-            results[i] = QplResult { node: i, input, output };
+            *result = QplResult { node: i, input, output };
         }
 
         // Modelo de latência: 2.37us + 0.1us por iteração adicional

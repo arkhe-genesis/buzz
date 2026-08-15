@@ -1,0 +1,13 @@
+pedantic = true
+# Permitir unwrap em testes
+allow-unwrap-in-tests = true
+# Exigir documentação
+warn-on-all-doc-comments = true
+# Checagem de segurança
+check = ["security-fixes", "vulnerabilities"]
+# Regras de dependência
+deny = [
+    "duplicate-crates",
+    "wildcard-dependencies",
+    "multiple-versions"
+]
