@@ -32,18 +32,19 @@ impl FastAead for Aes256GcmSivAead {
 }
 
 // ----------------------------------------------------------------------------
-use pqcrypto_dilithium::dilithium3 as dilithium;
+use pqcrypto_dilithium::dilithium3 as mldsa;
 use pqcrypto_traits::sign::{PublicKey as PqPublicKey, SecretKey as PqSecretKey, DetachedSignature};
 
 pub struct MlDsa65;
 
 impl PqSignature for MlDsa65 {
-    const PUBLIC_KEY_LEN: usize = dilithium::public_key_bytes();
-    const SIGNATURE_LEN: usize = dilithium::signature_bytes();
+    const PUBLIC_KEY_LEN: usize = mldsa::public_key_bytes();
+    const SIGNATURE_LEN: usize = mldsa::signature_bytes();
+    const SECRET_KEY_LEN: usize = mldsa::secret_key_bytes();
 
     fn sign(&self, msg: &[u8], sk: &[u8]) -> Vec<u8> {
-        let sk = dilithium::SecretKey::from_bytes(sk).expect("invalid ML-DSA secret key length");
-        let sig = dilithium::detached_sign(msg, &sk);
+        let sk = mldsa::SecretKey::from_bytes(sk).expect("invalid ML-DSA secret key length");
+        let sig = mldsa::detached_sign(msg, &sk);
         sig.as_bytes().to_vec()
     }
 
@@ -57,7 +58,7 @@ impl PqSignature for MlDsa65 {
             Err(_) => return false,
         };
         // wait, I will just call verify_detached directly since traits don't have it under sign
-        dilithium::verify_detached_signature(&sig, msg, &pk).is_ok()
+        mldsa::verify_detached_signature(&sig, msg, &pk).is_ok()
     }
 }
 

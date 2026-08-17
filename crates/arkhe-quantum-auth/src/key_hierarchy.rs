@@ -12,7 +12,7 @@ pub struct KeyHierarchy {
     session_key: [u8; 32],
     burst_key: [u8; 32],
     session_counter: u64,
-    burst_counter: u64,
+    pub burst_counter: u64,
     pub msg_counter: u64,
 }
 
@@ -80,6 +80,10 @@ impl KeyHierarchy {
 
         if self.msg_counter >= Self::MAX_MSGS_PER_BURST {
             self.rotate_burst()?;
+        }
+
+        if self.burst_counter == u64::MAX {
+            return Err(AuthError::CounterExhausted);
         }
         Ok(self.derive_nonce())
     }

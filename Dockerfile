@@ -52,6 +52,7 @@ RUN cargo chef prepare --recipe-path recipe.json
 # ─── Stage 3: cook dependencies, then build the binary ──────────────────────
 FROM chef AS builder
 RUN apt-get update \
+    && apt-get install -y gfortran libblas-dev liblapack-dev \
     && apt-get install -y --no-install-recommends \
         build-essential \
         pkg-config \
@@ -125,6 +126,7 @@ LABEL org.opencontainers.image.title="Buzz" \
       org.opencontainers.image.licenses="Apache-2.0"
 
 RUN apt-get update \
+    && apt-get install -y gfortran libblas-dev liblapack-dev \
     && apt-get install -y --no-install-recommends \
         ca-certificates \
         curl \

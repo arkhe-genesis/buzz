@@ -100,7 +100,7 @@ fn test_full_link_establishment_and_herald_exchange() {
     let decap_msg = SlowPathMessage::KemEncapsulate { ct, ephemeral_pk };
 
     // Use dummy bob key that is large enough just so it doesn't fail early bounds checks on the mock/stub
-    let mut bob_kem_sk = alloc::vec![0u8; 2432];
+    let mut bob_kem_sk = alloc::vec![0u8; 4032];
     let (bob_ss, _peer_pk) = bob.stack.slow.bootstrap_decapsulate(&decap_msg, &bob_kem_sk).unwrap_or(([0u8;32], alloc::vec![]));
 
     let mut alice_kh = KeyHierarchy::from_xwing_shared_secret(alice_ss).unwrap();
@@ -242,7 +242,8 @@ fn test_counter_exhaustion_protection() {
     let mut node = setup_node(0x09);
     let ss = [0x11; 32];
     let mut kh = KeyHierarchy::from_xwing_shared_secret(ss).unwrap();
-    kh.msg_counter = u64::MAX - 1;
+    kh.msg_counter = KeyHierarchy::MAX_MSGS_PER_BURST - 2;
+    kh.burst_counter = u64::MAX - 1;
     node.stack.fast = FastPathAuth::new(kh, Aes256GcmSivAead);
 
     let mut msg1 = HeraldMessage {
@@ -258,6 +259,9 @@ fn test_counter_exhaustion_protection() {
 
     let mut msg2 = msg1.clone();
     let result = node.stack.send_herald(&mut msg2);
+    if let Err(e) = &result {
+        println!("Error: {:?}", e);
+    }
     assert!(result.is_err(), "must fail on counter exhaustion");
     match result.unwrap_err() {
         arkhe_quantum_auth::AuthError::CounterExhausted => {},

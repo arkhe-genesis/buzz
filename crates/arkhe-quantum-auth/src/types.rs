@@ -14,6 +14,7 @@ use crate::error::AuthResult;
 /// A post-quantum signature scheme (ML-DSA-65 profile).
 pub trait PqSignature {
     const PUBLIC_KEY_LEN: usize;
+    const SECRET_KEY_LEN: usize;
     const SIGNATURE_LEN: usize;
 
     fn sign(&self, msg: &[u8], sk: &[u8]) -> Vec<u8>;
