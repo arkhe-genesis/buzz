@@ -1,5 +1,4 @@
 use ndarray::prelude::*;
-use ndarray_linalg::*;
 use serde::{Deserialize, Serialize};
 use crate::mhd::EvoField;
 

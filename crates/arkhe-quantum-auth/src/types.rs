@@ -1,3 +1,4 @@
+#![allow(missing_docs)]
 //! Core types and cryptographic trait abstractions.
 
 use alloc::vec::Vec;

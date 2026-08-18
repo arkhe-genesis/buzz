@@ -9,7 +9,7 @@ pub struct SramDxController {
     bank_x: [[u8; 8]; FULL_NODES],  // 16 vértices expandidos
     active: BufferId,
     ready_sequence: AtomicU64,
-
+    _clock: ClockDomain,
 }
 
 impl SramDxController {
@@ -19,7 +19,7 @@ impl SramDxController {
             bank_x: [[0u8; 8]; FULL_NODES],
             active: BufferId::Domain,
             ready_sequence: AtomicU64::new(0),
-
+            _clock: clock,
         }
     }
 
@@ -92,7 +92,7 @@ impl ArkhePeripheral for SramDxController {
         }
     }
 
-    fn write_reg(&mut self, addr: u32, val: u32) -> Result<(), SocError> {
+    fn write_reg(&mut self, addr: u32, _val: u32) -> Result<(), SocError> {
         match addr {
             0x10 => {
                 // Trigger swap manual (debug)

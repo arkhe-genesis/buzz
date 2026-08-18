@@ -1,5 +1,5 @@
 use crate::{
-    aotb::{AotbEncoderHw, AotbVerifierHw}, AotbFrame, ClockDomain, DOMAIN_NODES, PerformanceCounters,
+    aotb::AotbEncoderHw, AotbFrame, ClockDomain, DOMAIN_NODES, PerformanceCounters,
     power::PowerDomain, qpl::QplAccelerator, QplResult, sram::SramDxController,
 };
 
@@ -55,16 +55,17 @@ impl ArkheSoc {
     ) -> Result<AotbFrame, crate::SocError> {
         let mut values = [0.0; DOMAIN_NODES];
         for (i, val) in values.iter_mut().enumerate().take(DOMAIN_NODES) {
-             *val = self.sram.read_domain_d(i as u8).unwrap_or(0.0);
+            *val = self.sram.read_domain_d(i as u8).unwrap_or(0.0);
         }
         encoder.next_frame(values, self.weights)
     }
 
     pub fn counters(&self) -> PerformanceCounters {
-        let mut c = PerformanceCounters {
-        qpl_cycles: self.qpl.counters.qpl_cycles,
-        expand_cycles: self.qpl.counters.expand_cycles,
-        power_mw: self.power.estimate_power_mw(), ..Default::default() };
-        c
+        PerformanceCounters {
+            qpl_cycles: self.qpl.counters.qpl_cycles,
+            expand_cycles: self.qpl.counters.expand_cycles,
+            power_mw: self.power.estimate_power_mw(),
+            ..Default::default()
+        }
     }
 }

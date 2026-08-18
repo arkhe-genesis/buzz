@@ -172,7 +172,7 @@ impl EvoField {
         let dt_diff = (dx*dx).min(dy*dy) / (4.0 * nu + 1e-12);
         let dt_adv = dx / (u_max + 1e-12);
         let dt_max = dt_diff.min(dt_adv);
-        if dt > dt_max { Err(format!("CFL violado")) } else { Ok(()) }
+        if dt > dt_max { Err("CFL violado".to_string()) } else { Ok(()) }
     }
 }
 
