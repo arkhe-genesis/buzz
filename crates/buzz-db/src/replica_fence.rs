@@ -521,7 +521,8 @@ mod tests {
         assert!(fence.verified_through().is_none(), "must start closed");
         assert!(!fence.covers(Utc::now() - chrono::Duration::days(365)));
 
-        let ts = Utc::now();
+        // Truncate to micros because verified_through converts to and from micros
+        let ts = DateTime::from_timestamp_micros(Utc::now().timestamp_micros()).unwrap();
         fence.advance(ts);
         assert_eq!(fence.verified_through(), Some(ts));
         assert!(fence.covers(ts - chrono::Duration::seconds(1)));

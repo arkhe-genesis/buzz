@@ -50,7 +50,7 @@ impl<S: PqSignature, K: PqKem> SlowPathAuth<S, K> {
     ) -> (Self, Vec<u8>) {
         let (_kem_pk, _kem_sk) = kem.keygen(rng);
 
-        let mut our_sk = alloc::vec![0u8; S::PUBLIC_KEY_LEN];
+        let mut our_sk = alloc::vec![0u8; S::SECRET_KEY_LEN];
         let mut our_pk = alloc::vec![0u8; S::PUBLIC_KEY_LEN];
         rng.fill_bytes(&mut our_sk);
         rng.fill_bytes(&mut our_pk);
