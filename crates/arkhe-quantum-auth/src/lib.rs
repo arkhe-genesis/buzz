@@ -55,8 +55,18 @@ where
     P: PolicyEngine,
 {
     /// Create a new auth stack from pre-initialized components.
-    pub fn new(fast: FastPathAuth<A>, slow: SlowPathAuth<S, K>, policy: P, context: PolicyContext) -> Self {
-        Self { fast, slow, policy, context }
+    pub fn new(
+        fast: FastPathAuth<A>,
+        slow: SlowPathAuth<S, K>,
+        policy: P,
+        context: PolicyContext,
+    ) -> Self {
+        Self {
+            fast,
+            slow,
+            policy,
+            context,
+        }
     }
 
     /// Process an incoming herald message: policy -> verify.
@@ -65,7 +75,9 @@ where
             PolicyDecision::Allow => self.fast.verify_herald(msg),
             PolicyDecision::RateLimit { delay_ns } => {
                 log::debug!("herald rate-limited: delay={}ns", delay_ns);
-                Err(AuthError::PolicyViolation { reason: alloc::format!("rate_limited:{}ns", delay_ns) })
+                Err(AuthError::PolicyViolation {
+                    reason: alloc::format!("rate_limited:{}ns", delay_ns),
+                })
             }
             PolicyDecision::Reject { reason } => Err(AuthError::PolicyViolation { reason }),
         }
@@ -77,7 +89,9 @@ where
             PolicyDecision::Allow => self.fast.seal_herald(msg),
             PolicyDecision::RateLimit { delay_ns } => {
                 log::debug!("herald send rate-limited: delay={}ns", delay_ns);
-                Err(AuthError::PolicyViolation { reason: alloc::format!("rate_limited:{}ns", delay_ns) })
+                Err(AuthError::PolicyViolation {
+                    reason: alloc::format!("rate_limited:{}ns", delay_ns),
+                })
             }
             PolicyDecision::Reject { reason } => Err(AuthError::PolicyViolation { reason }),
         }
@@ -86,7 +100,9 @@ where
     /// Execute key rotation via Slow Path.
     pub fn rotate_keys(&mut self, new_counter: u64) -> AuthResult<SlowPathMessage> {
         let ts = platform::monotonic_ns();
-        let cmd = self.slow.sign_rotation(new_counter, ts, &self.context.node_did);
+        let cmd = self
+            .slow
+            .sign_rotation(new_counter, ts, &self.context.node_did);
         match self.policy.evaluate_slow(&cmd, &self.context) {
             PolicyDecision::Allow => {
                 self.fast.key_hierarchy.rotate_session()?;
@@ -94,7 +110,9 @@ where
                 Ok(cmd)
             }
             PolicyDecision::Reject { reason } => Err(AuthError::PolicyViolation { reason }),
-            _ => Err(AuthError::PolicyViolation { reason: "rotation_rate_limited".into() }),
+            _ => Err(AuthError::PolicyViolation {
+                reason: "rotation_rate_limited".into(),
+            }),
         }
     }
 }

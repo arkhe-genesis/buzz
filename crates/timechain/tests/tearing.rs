@@ -10,5 +10,8 @@ fn test_tearing_mode() {
     let uy = Array2::zeros((64, 128));
     let dt = 0.001;
     field.check_cfl(dt, 0.1).unwrap();
-    for _ in 0..1000 { field.advance(dt, &ux, &uy); detector.detect(&field); }
+    for _ in 0..1000 {
+        field.advance(dt, &ux, &uy);
+        detector.detect(&field);
+    }
 }

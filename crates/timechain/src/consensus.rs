@@ -1,7 +1,7 @@
-use std::collections::HashMap;
 use crate::EchoSignal;
-use std::f64::consts::PI;
 use num_complex::Complex64;
+use std::collections::HashMap;
+use std::f64::consts::PI;
 
 pub struct ConsensusEngine {
     pub finality_threshold: f64,
@@ -10,17 +10,25 @@ pub struct ConsensusEngine {
 
 impl ConsensusEngine {
     pub fn new(threshold: f64) -> Self {
-        Self { finality_threshold: threshold, received_echos: HashMap::new() }
+        Self {
+            finality_threshold: threshold,
+            received_echos: HashMap::new(),
+        }
     }
 
     pub fn add_echo(&mut self, echo: EchoSignal) {
-        self.received_echos.entry(echo.origin_height).or_default().push(echo);
+        self.received_echos
+            .entry(echo.origin_height)
+            .or_default()
+            .push(echo);
     }
 
     pub fn check_finality(&self, height: u64, local_phase: f64) -> bool {
         let empty = vec![];
         let echos = self.received_echos.get(&height).unwrap_or(&empty);
-        if echos.len() < 3 { return false; }
+        if echos.len() < 3 {
+            return false;
+        }
         let mut complex_sum = Complex64::new(0.0, 0.0);
         for echo in echos {
             let amp = echo.strength;

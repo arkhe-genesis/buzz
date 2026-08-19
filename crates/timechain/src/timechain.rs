@@ -1,7 +1,7 @@
-use serde::{Deserialize, Serialize};
 use crate::mhd::EvoField;
-use crate::shadow::Shadow;
 use crate::retro::EchoSignal;
+use crate::shadow::Shadow;
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TimeBlock {
@@ -29,9 +29,13 @@ impl TimeBlock {
     }
 }
 
-pub struct ChernSimonsOracle { pub tolerance: f64 }
+pub struct ChernSimonsOracle {
+    pub tolerance: f64,
+}
 impl ChernSimonsOracle {
-    pub fn new(tolerance: f64) -> Self { Self { tolerance } }
+    pub fn new(tolerance: f64) -> Self {
+        Self { tolerance }
+    }
     pub fn verify(&self, block: &TimeBlock, field: &EvoField) -> bool {
         let predicted_h = block.echo_signature.predicted_helicity;
         let actual_h = field.helicity();

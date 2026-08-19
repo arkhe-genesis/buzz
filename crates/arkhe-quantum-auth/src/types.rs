@@ -38,13 +38,7 @@ pub trait FastAead {
     const NONCE_LEN: usize = 12;
     const TAG_LEN: usize = 16;
 
-    fn seal(
-        &self,
-        key: &[u8; 32],
-        nonce: &[u8; 12],
-        aad: &[u8],
-        plaintext: &mut [u8],
-    ) -> [u8; 16];
+    fn seal(&self, key: &[u8; 32], nonce: &[u8; 12], aad: &[u8], plaintext: &mut [u8]) -> [u8; 16];
 
     fn open(
         &self,

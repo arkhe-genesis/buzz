@@ -386,7 +386,10 @@ async fn tool_metadata_caps_enforced() {
     // OR it accepts and we verify the LLM request stays bounded.
     if r.get("error").is_some() {
         let msg = r["error"]["message"].as_str().unwrap_or("");
-        assert!(msg.contains("too many") || msg.contains("timeout"), "unexpected error: {msg}");
+        assert!(
+            msg.contains("too many") || msg.contains("timeout"),
+            "unexpected error: {msg}"
+        );
         h.shutdown().await;
         return;
     }

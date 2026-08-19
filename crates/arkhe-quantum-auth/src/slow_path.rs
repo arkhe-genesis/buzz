@@ -2,8 +2,8 @@
 //! Slow Path: bootstrap, key rotation, and bundle attestation.
 
 use alloc::vec::Vec;
-use zeroize::{Zeroize, ZeroizeOnDrop};
 use rand_core::CryptoRngCore;
+use zeroize::{Zeroize, ZeroizeOnDrop};
 
 use crate::error::{AuthError, AuthResult};
 use crate::types::{PqKem, PqSignature};
@@ -43,11 +43,7 @@ impl<S: PqSignature, K: PqKem> Drop for SlowPathAuth<S, K> {
 }
 
 impl<S: PqSignature, K: PqKem> SlowPathAuth<S, K> {
-    pub fn generate(
-        sig: S,
-        kem: K,
-        rng: &mut dyn CryptoRngCore,
-    ) -> (Self, Vec<u8>) {
+    pub fn generate(sig: S, kem: K, rng: &mut dyn CryptoRngCore) -> (Self, Vec<u8>) {
         let (_kem_pk, _kem_sk) = kem.keygen(rng);
 
         let mut our_sk = alloc::vec![0u8; S::SECRET_KEY_LEN];
@@ -65,12 +61,7 @@ impl<S: PqSignature, K: PqKem> SlowPathAuth<S, K> {
         (auth, our_pk)
     }
 
-    pub fn from_secret_key(
-        sig: S,
-        kem: K,
-        sk: Vec<u8>,
-        pk: Vec<u8>,
-    ) -> AuthResult<Self> {
+    pub fn from_secret_key(sig: S, kem: K, sk: Vec<u8>, pk: Vec<u8>) -> AuthResult<Self> {
         if sk.len() != S::PUBLIC_KEY_LEN || pk.len() != S::PUBLIC_KEY_LEN {
             return Err(AuthError::InvalidKey);
         }
@@ -139,11 +130,7 @@ impl<S: PqSignature, K: PqKem> SlowPathAuth<S, K> {
         }
     }
 
-    pub fn verify_rotation(
-        &self,
-        msg: &SlowPathMessage,
-        peer_pk: &[u8],
-    ) -> AuthResult<u64> {
+    pub fn verify_rotation(&self, msg: &SlowPathMessage, peer_pk: &[u8]) -> AuthResult<u64> {
         match msg {
             SlowPathMessage::KeyRotation {
                 new_session_counter,
@@ -173,13 +160,12 @@ impl<S: PqSignature, K: PqKem> SlowPathAuth<S, K> {
         }
     }
 
-    pub fn verify_bundle(
-        &self,
-        msg: &SlowPathMessage,
-        peer_pk: &[u8],
-    ) -> AuthResult<[u8; 32]> {
+    pub fn verify_bundle(&self, msg: &SlowPathMessage, peer_pk: &[u8]) -> AuthResult<[u8; 32]> {
         match msg {
-            SlowPathMessage::BundleAttestation { bundle_hash, signature } => {
+            SlowPathMessage::BundleAttestation {
+                bundle_hash,
+                signature,
+            } => {
                 if !self.sig.verify(bundle_hash, signature, peer_pk) {
                     return Err(AuthError::SlowPathVerification);
                 }

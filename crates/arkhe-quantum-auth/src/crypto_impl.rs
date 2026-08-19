@@ -33,7 +33,9 @@ impl FastAead for Aes256GcmSivAead {
 
 // ----------------------------------------------------------------------------
 use pqcrypto_dilithium::dilithium3 as mldsa;
-use pqcrypto_traits::sign::{PublicKey as PqPublicKey, SecretKey as PqSecretKey, DetachedSignature};
+use pqcrypto_traits::sign::{
+    DetachedSignature, PublicKey as PqPublicKey, SecretKey as PqSecretKey,
+};
 
 pub struct MlDsa65;
 
@@ -64,7 +66,10 @@ impl PqSignature for MlDsa65 {
 
 // ----------------------------------------------------------------------------
 use pqcrypto_kyber::kyber768;
-use pqcrypto_traits::kem::{PublicKey as KemPublicKey, SecretKey as KemSecretKey, Ciphertext as KemCiphertext, SharedSecret as KemSharedSecret};
+use pqcrypto_traits::kem::{
+    Ciphertext as KemCiphertext, PublicKey as KemPublicKey, SecretKey as KemSecretKey,
+    SharedSecret as KemSharedSecret,
+};
 use x25519_dalek::{PublicKey as X25519PublicKey, StaticSecret as X25519StaticSecret};
 
 pub struct XWingKem;
@@ -131,13 +136,13 @@ impl PqKem for XWingKem {
 
         let kyber_sk = kyber768::SecretKey::from_bytes(&sk[..KYBER_SK_LEN]).unwrap();
 
-        let kyber_ct = kyber768::Ciphertext::from_bytes(kyber_ct_bytes).map_err(|_| AuthError::KemDecapsulation)?;
-        let kyber_ss = kyber768::decapsulate(
-            &kyber_ct,
-            &kyber_sk,
-        );
+        let kyber_ct = kyber768::Ciphertext::from_bytes(kyber_ct_bytes)
+            .map_err(|_| AuthError::KemDecapsulation)?;
+        let kyber_ss = kyber768::decapsulate(&kyber_ct, &kyber_sk);
 
-        let x25519_sk_bytes: [u8; 32] = sk[KYBER_SK_LEN..KYBER_SK_LEN + X25519_SK_LEN].try_into().unwrap();
+        let x25519_sk_bytes: [u8; 32] = sk[KYBER_SK_LEN..KYBER_SK_LEN + X25519_SK_LEN]
+            .try_into()
+            .unwrap();
         let x25519_sk = X25519StaticSecret::from(x25519_sk_bytes);
 
         let x25519_eph_pk_arr: [u8; 32] = x25519_eph_pk_bytes.try_into().unwrap();

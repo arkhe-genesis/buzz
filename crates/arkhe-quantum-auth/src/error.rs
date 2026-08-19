@@ -35,7 +35,9 @@ impl fmt::Display for AuthError {
             AuthError::SlowPathVerification => write!(f, "slow-path verification failed"),
             AuthError::KeyDerivation => write!(f, "key derivation failed"),
             AuthError::PolicyViolation { reason } => write!(f, "policy violation: {}", reason),
-            AuthError::CounterExhausted => write!(f, "counter exhausted — emergency rotation required"),
+            AuthError::CounterExhausted => {
+                write!(f, "counter exhausted — emergency rotation required")
+            }
             AuthError::HardwareFailure => write!(f, "hardware/RNG failure"),
             AuthError::InvalidKey => write!(f, "invalid key format"),
             AuthError::KemDecapsulation => write!(f, "KEM decapsulation failed"),

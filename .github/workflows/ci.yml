@@ -836,8 +836,10 @@ jobs:
     steps:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
       - uses: cashapp/activate-hermit@cea9af7913204a965fd488637a8d1811bba2e616 # v1
-      - name: Dependency policy
-        run: cargo-deny check
+      - name: Full CI check
+        run: |
+          cargo install cargo-llvm-cov cargo-insta cargo-deny cargo-audit cargo-semver-checks
+          cargo xtask ci
 
   dead-token-guard:
     name: Dead Token Reference Guard
@@ -1059,3 +1061,15 @@ jobs:
           LLAMA_STAGE_BACKEND: metal
           LLAMA_STAGE_BUILD_DIR: ${{ github.workspace }}/.cache/mesh-llama/build-stage-abi-metal
           SKIPPY_LLAMA_AUTO_BUILD: "0"
+
+  check-msrv:
+    name: Check MSRV
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+      - name: Install Rust toolchain
+        run: rustup default 1.91.0 && rustup component add clippy
+      - name: Check MSRV
+        run: cargo check --workspace --all-targets
+        env:
+          RUSTUP_TOOLCHAIN: 1.91.0

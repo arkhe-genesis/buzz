@@ -1,9 +1,9 @@
 use ::timechain::*;
 use ndarray::prelude::*;
-use std::sync::Arc;
-use tokio::sync::Mutex;
-use std::time::Duration;
 use ndarray_linalg::*;
+use std::sync::Arc;
+use std::time::Duration;
+use tokio::sync::Mutex;
 
 #[tokio::main]
 async fn main() {
@@ -27,7 +27,10 @@ async fn main() {
             let mut f = field.lock().await;
             f.advance(dt, &ux, &uy);
         }
-        let h = { let f = field.lock().await; f.helicity() };
+        let h = {
+            let f = field.lock().await;
+            f.helicity()
+        };
         let handover = detector.detect(&*field.lock().await);
         if handover {
             let f = field.lock().await;
@@ -49,16 +52,31 @@ async fn main() {
                 let shadow = Shadow::from_svd(&u, &s, &vt, 5);
                 let healer = ShadowHealer::new(0.1);
                 healer.heal(&mut f, &shadow);
-                println!("[💚 Cura] Eco recebido (altura {}) | strength={:.3}", echo.origin_height, echo.strength);
+                println!(
+                    "[💚 Cura] Eco recebido (altura {}) | strength={:.3}",
+                    echo.origin_height, echo.strength
+                );
             }
         }
         observer.update(dt);
         if step % 100 == 0 {
-            let energy = { let f = field.lock().await; f.energy() };
-            println!("t={:.3} | E={:.4} | H={:.6} | 𝒜={:.3} | Handovers={}",
-                     step as f64 * dt, energy, h, observer.attachment, detector.handover_count);
+            let energy = {
+                let f = field.lock().await;
+                f.energy()
+            };
+            println!(
+                "t={:.3} | E={:.4} | H={:.6} | 𝒜={:.3} | Handovers={}",
+                step as f64 * dt,
+                energy,
+                h,
+                observer.attachment,
+                detector.handover_count
+            );
         }
         tokio::time::sleep(Duration::from_micros(1)).await;
     }
-    println!("✅ Simulação concluída. Handovers totais: {}", detector.handover_count);
+    println!(
+        "✅ Simulação concluída. Handovers totais: {}",
+        detector.handover_count
+    );
 }

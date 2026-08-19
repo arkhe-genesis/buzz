@@ -1,14 +1,23 @@
-use tokio::net::UdpSocket;
+use crate::{EchoSignal, EvoField, PlasmaConfig, TimeBlock};
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::net::SocketAddr;
-use serde::{Serialize, Deserialize};
-use crate::{EchoSignal, TimeBlock, PlasmaConfig, EvoField};
+use tokio::net::UdpSocket;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum NetworkMessage {
-    Heartbeat { node_id: u64, field_hash: [u8; 32], phase_time: f64 },
-    Echo { echo: EchoSignal, block: Box<TimeBlock> },
-    BlockRequest { height: u64 },
+    Heartbeat {
+        node_id: u64,
+        field_hash: [u8; 32],
+        phase_time: f64,
+    },
+    Echo {
+        echo: EchoSignal,
+        block: Box<TimeBlock>,
+    },
+    BlockRequest {
+        height: u64,
+    },
 }
 
 pub struct PeerInfo {
@@ -37,11 +46,20 @@ impl P2PNode {
         let socket = UdpSocket::bind(addr).await.unwrap();
         let node_id = rand::random();
         let field = EvoField::harris_sheet(config);
-        Self { socket, node_id, peers: HashMap::new(), config, field }
+        Self {
+            socket,
+            node_id,
+            peers: HashMap::new(),
+            config,
+            field,
+        }
     }
 
     pub async fn broadcast_echo(&self, echo: EchoSignal, block: TimeBlock) {
-        let packet = NetworkMessage::Echo { echo: echo.clone(), block: Box::new(block) };
+        let packet = NetworkMessage::Echo {
+            echo: echo.clone(),
+            block: Box::new(block),
+        };
         let serialized = bincode::serialize(&packet).unwrap();
 
         for (peer_addr, _info) in self.peers.iter() {
@@ -67,7 +85,11 @@ impl P2PNode {
             NetworkMessage::Echo { echo, block } => {
                 self.process_echo(echo, *block).await;
             }
-            NetworkMessage::Heartbeat { node_id, field_hash: _, phase_time: _ } => {
+            NetworkMessage::Heartbeat {
+                node_id,
+                field_hash: _,
+                phase_time: _,
+            } => {
                 self.peers.entry(src).or_insert(PeerInfo::new(node_id));
             }
             _ => {}

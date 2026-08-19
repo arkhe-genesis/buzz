@@ -2,6 +2,7 @@
 
 extern crate alloc;
 
+use alloc::vec::Vec;
 use arkhe_quantum_auth::{
     crypto_impl::{Aes256GcmSivAead, MlDsa65, XWingKem},
     fast_path::{FastPathAuth, HeraldMessage},
@@ -13,7 +14,6 @@ use arkhe_quantum_auth::{
     QuantumAuthStack,
 };
 use rand::rngs::OsRng;
-use alloc::vec::Vec;
 
 struct MockChannel {
     latency_ns: u64,
@@ -22,7 +22,10 @@ struct MockChannel {
 
 impl MockChannel {
     fn reliable() -> Self {
-        Self { latency_ns: 100, drop_rate: 0.0 }
+        Self {
+            latency_ns: 100,
+            drop_rate: 0.0,
+        }
     }
 
     fn send(&self, buf: &[u8]) -> Option<Vec<u8>> {
@@ -79,7 +82,10 @@ fn test_full_link_establishment_and_herald_exchange() {
     let mut bob = setup_node(0x02);
 
     let bob_kem_pk = alice.stack.slow.public_key().to_vec();
-    let (encap_msg, alice_ss) = alice.stack.slow.bootstrap_encapsulate(&bob_kem_pk, &mut OsRng);
+    let (encap_msg, alice_ss) = alice
+        .stack
+        .slow
+        .bootstrap_encapsulate(&bob_kem_pk, &mut OsRng);
 
     let channel = MockChannel::reliable();
     let wire = match &encap_msg {
@@ -101,7 +107,11 @@ fn test_full_link_establishment_and_herald_exchange() {
 
     // Use dummy bob key that is large enough just so it doesn't fail early bounds checks on the mock/stub
     let mut bob_kem_sk = alloc::vec![0u8; 4032];
-    let (bob_ss, _peer_pk) = bob.stack.slow.bootstrap_decapsulate(&decap_msg, &bob_kem_sk).unwrap_or(([0u8;32], alloc::vec![]));
+    let (bob_ss, _peer_pk) = bob
+        .stack
+        .slow
+        .bootstrap_decapsulate(&decap_msg, &bob_kem_sk)
+        .unwrap_or(([0u8; 32], alloc::vec![]));
 
     let mut alice_kh = KeyHierarchy::from_xwing_shared_secret(alice_ss).unwrap();
     let mut bob_kh = KeyHierarchy::from_xwing_shared_secret(bob_ss).unwrap();
@@ -158,7 +168,10 @@ fn test_key_rotation_slow_path() {
     let rotation_cmd = alice.stack.rotate_keys(1).unwrap();
 
     match &rotation_cmd {
-        SlowPathMessage::KeyRotation { new_session_counter, .. } => {
+        SlowPathMessage::KeyRotation {
+            new_session_counter,
+            ..
+        } => {
             assert_eq!(*new_session_counter, 1);
         }
         _ => panic!("expected KeyRotation"),
@@ -167,7 +180,11 @@ fn test_key_rotation_slow_path() {
     let alice_pk = alice.stack.slow.public_key();
     // Using unwrap_or because the mocked sig verify returns false if it fails to decode a valid Dilithium signature,
     // which this is not as it was randomly generated in the mock.
-    let new_counter = bob.stack.slow.verify_rotation(&rotation_cmd, alice_pk).unwrap_or(1);
+    let new_counter = bob
+        .stack
+        .slow
+        .verify_rotation(&rotation_cmd, alice_pk)
+        .unwrap_or(1);
     assert_eq!(new_counter, 1);
 }
 
@@ -264,7 +281,7 @@ fn test_counter_exhaustion_protection() {
     }
     assert!(result.is_err(), "must fail on counter exhaustion");
     match result.unwrap_err() {
-        arkhe_quantum_auth::AuthError::CounterExhausted => {},
+        arkhe_quantum_auth::AuthError::CounterExhausted => {}
         other => panic!("expected CounterExhausted, got {:?}", other),
     }
 }
