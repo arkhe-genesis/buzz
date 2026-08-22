@@ -2,6 +2,7 @@
 members = [
     "crates/arkhe-buzz-integration",
     "crates/arkhe-quantum-auth",
+    "crates/arkhe-vision",
     "crates/buzz-relay",
     "crates/arkhe-soc-tlm",
     "crates/timechain",
@@ -32,7 +33,7 @@ members = [
     "crates/buzz-dev-mcp",
     "examples/countdown-bot", "crates/arkhe-buzz-integration",
     "crates/arkhe-quantum-auth",
-    "crates/xtask",
+    "crates/arkhe-vision",
 ]
 exclude = ["desktop/src-tauri"]
 resolver = "2"
