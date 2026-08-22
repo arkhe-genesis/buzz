@@ -3,7 +3,6 @@
 use alloc::format;
 use alloc::string::String;
 
-use crate::error::AuthResult;
 use crate::fast_path::HeraldMessage;
 use crate::slow_path::SlowPathMessage;
 

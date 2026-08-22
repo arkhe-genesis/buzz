@@ -2,7 +2,7 @@
 //! Core types and cryptographic trait abstractions.
 
 use alloc::vec::Vec;
-use core::time::Duration;
+
 use rand_core::CryptoRngCore;
 use zeroize::{Zeroize, ZeroizeOnDrop};
 

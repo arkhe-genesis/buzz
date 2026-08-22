@@ -1422,11 +1422,11 @@ fn parse_envelope(json_str: &str) -> Result<Envelope, String> {
         if nostr::secp256k1::XOnlyPublicKey::from_slice(&hex::decode(owner).unwrap_or_default())
             .is_err()
         {
-            return Err(format!("oa[0] is not a valid BIP-340 public key"));
+            return Err("oa[0] is not a valid BIP-340 public key".to_string());
         }
         // Validate oa[0] is a valid BIP-340 x-only public key (not just hex)
         PublicKey::from_hex(owner)
-            .map_err(|_e| format!("oa[0] is not a valid BIP-340 public key"))?;
+            .map_err(|_e| "oa[0] is not a valid BIP-340 public key".to_string())?;
 
         // Self-attestation is meaningless — owner must differ from signer
         if owner == pk {

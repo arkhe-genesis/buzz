@@ -401,7 +401,7 @@ mod tests {
             )
             .await
             .expect("response");
-        // assert_eq!(response.status(), axum::http::StatusCode::NOT_FOUND);
+        assert_eq!(response.status(), axum::http::StatusCode::NOT_FOUND);
     }
 
     #[tokio::test]

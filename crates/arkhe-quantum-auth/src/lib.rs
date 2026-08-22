@@ -1,6 +1,5 @@
 #![no_std]
-#![warn(missing_docs, unsafe_op_in_unsafe_fn)]
-#![cfg_attr(feature = "no_std", deny(std))]
+#![warn(unsafe_op_in_unsafe_fn)]
 
 extern crate alloc;
 
@@ -151,11 +150,10 @@ pub mod platform {
             extern crate std;
             use std::time::{SystemTime, UNIX_EPOCH};
             // Use system time for absolute timestamps; Instant for relative
-            let now = SystemTime::now()
+            SystemTime::now()
                 .duration_since(UNIX_EPOCH)
                 .unwrap_or_default()
-                .as_nanos() as u64;
-            now
+                .as_nanos() as u64
         }
         #[cfg(not(feature = "std"))]
         {

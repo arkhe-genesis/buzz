@@ -1,6 +1,5 @@
 //! Fast Path: herald message authentication at line rate.
 
-use alloc::vec::Vec;
 use zeroize::{Zeroize, ZeroizeOnDrop};
 
 use crate::error::AuthResult;

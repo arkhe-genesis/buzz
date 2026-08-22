@@ -33,9 +33,7 @@ impl FastAead for Aes256GcmSivAead {
 
 // ----------------------------------------------------------------------------
 use pqcrypto_dilithium::dilithium3 as mldsa;
-use pqcrypto_traits::sign::{
-    DetachedSignature, PublicKey as PqPublicKey, SecretKey as PqSecretKey,
-};
+use pqcrypto_traits::sign::{DetachedSignature, SecretKey as PqSecretKey};
 
 pub struct MlDsa65;
 

@@ -106,15 +106,15 @@ fn test_full_link_establishment_and_herald_exchange() {
     let decap_msg = SlowPathMessage::KemEncapsulate { ct, ephemeral_pk };
 
     // Use dummy bob key that is large enough just so it doesn't fail early bounds checks on the mock/stub
-    let mut bob_kem_sk = alloc::vec![0u8; 4032];
+    let bob_kem_sk = alloc::vec![0u8; 4032];
     let (bob_ss, _peer_pk) = bob
         .stack
         .slow
         .bootstrap_decapsulate(&decap_msg, &bob_kem_sk)
         .unwrap_or(([0u8; 32], alloc::vec![]));
 
-    let mut alice_kh = KeyHierarchy::from_xwing_shared_secret(alice_ss).unwrap();
-    let mut bob_kh = KeyHierarchy::from_xwing_shared_secret(bob_ss).unwrap();
+    let alice_kh = KeyHierarchy::from_xwing_shared_secret(alice_ss).unwrap();
+    let bob_kh = KeyHierarchy::from_xwing_shared_secret(bob_ss).unwrap();
 
     alice.stack.fast = FastPathAuth::new(alice_kh, Aes256GcmSivAead);
     bob.stack.fast = FastPathAuth::new(bob_kh, Aes256GcmSivAead);
