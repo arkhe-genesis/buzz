@@ -1,5 +1,5 @@
-use serde::{Deserialize, Serialize};
 use crate::mhd::EvoField;
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ObserverState {
@@ -33,9 +33,14 @@ impl ObserverState {
 
     pub fn update(&mut self, dt: f64) {
         let factor = (-self.relaxation_rate * dt).exp();
-        self.attachment = self.target_attachment + (self.attachment - self.target_attachment) * factor;
-        if self.attachment.abs() < 1e-12 { self.attachment = 0.0; }
-        if self.relaxation_rate > 1.0 { self.relaxation_rate *= 0.99; }
+        self.attachment =
+            self.target_attachment + (self.attachment - self.target_attachment) * factor;
+        if self.attachment.abs() < 1e-12 {
+            self.attachment = 0.0;
+        }
+        if self.relaxation_rate > 1.0 {
+            self.relaxation_rate *= 0.99;
+        }
         self.attachment += self.external_demand * dt * 0.1;
         self.attachment = self.attachment.clamp(0.0, 1.0);
     }

@@ -1,7 +1,6 @@
 #![allow(missing_docs)]
 //! Quantum Memory Controller Interface.
 
-use crate::error::AuthResult;
 use crate::types::StorageHandle;
 
 #[derive(Debug, Clone, PartialEq)]
@@ -39,7 +38,11 @@ pub struct PhotonDetectionPattern {
 }
 
 pub trait QuantumMemoryController {
-    fn store(&mut self, mode: u8, pulse_params: &EitPulseSequence) -> Result<StorageHandle, QmError>;
+    fn store(
+        &mut self,
+        mode: u8,
+        pulse_params: &EitPulseSequence,
+    ) -> Result<StorageHandle, QmError>;
     fn interfere_for_gbs(
         &mut self,
         handle_a: StorageHandle,
@@ -52,16 +55,17 @@ pub trait QuantumMemoryController {
         target: StorageHandle,
         dim: u8,
     ) -> Result<(), QmError>;
-    fn read_measurement(
-        &self,
-        handle: StorageHandle,
-    ) -> Result<(u32, u32), QmError>;
+    fn read_measurement(&self, handle: StorageHandle) -> Result<(u32, u32), QmError>;
     fn remaining_coherence_ns(&self, handle: StorageHandle) -> Result<u64, QmError>;
 }
 
 pub mod noise_model {
-    pub fn dephasing_rate(t2_star_ns: f64) -> f64 { 1e9 / t2_star_ns }
-    pub fn amplitude_damping_prob(t_store_ns: f64, t1_ns: f64) -> f64 { (t_store_ns / t1_ns).min(1.0) }
+    pub fn dephasing_rate(t2_star_ns: f64) -> f64 {
+        1e9 / t2_star_ns
+    }
+    pub fn amplitude_damping_prob(t_store_ns: f64, t1_ns: f64) -> f64 {
+        (t_store_ns / t1_ns).min(1.0)
+    }
     pub fn qudit_fidelity_dephasing(d: u8, gamma_hz: f64, t_store_ns: f64) -> f64 {
         let d = d as f64;
         let gamma_t = gamma_hz * t_store_ns * 1e-9;

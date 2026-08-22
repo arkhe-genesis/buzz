@@ -1,9 +1,8 @@
 //! Policy Engine integration for quantum link authentication.
 
-use alloc::string::String;
 use alloc::format;
+use alloc::string::String;
 
-use crate::error::AuthResult;
 use crate::fast_path::HeraldMessage;
 use crate::slow_path::SlowPathMessage;
 
@@ -35,7 +34,7 @@ impl Default for PolicyContext {
             last_rotation_ns: 0,
             anomaly_score: 0.0,
             max_mode_idx: 10,
-            clock_skew_tolerance_ns: 1_000_000, // 1 ms
+            clock_skew_tolerance_ns: 1_000_000,       // 1 ms
             min_rotation_interval_ns: 60_000_000_000, // 60 s
         }
     }
@@ -98,7 +97,9 @@ impl PolicyEngine for QuantumLinkPolicy {
         let elapsed = now.saturating_sub(ctx.last_rotation_ns);
         if elapsed < ctx.min_rotation_interval_ns {
             let remaining = ctx.min_rotation_interval_ns - elapsed;
-            return PolicyDecision::RateLimit { delay_ns: remaining };
+            return PolicyDecision::RateLimit {
+                delay_ns: remaining,
+            };
         }
         PolicyDecision::Allow
     }

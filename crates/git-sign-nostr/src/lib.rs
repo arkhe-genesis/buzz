@@ -1419,12 +1419,14 @@ fn parse_envelope(json_str: &str) -> Result<Envelope, String> {
             );
         }
 
-        if nostr::secp256k1::XOnlyPublicKey::from_slice(&hex::decode(owner).unwrap_or_default()).is_err() {
-            return Err(format!("oa[0] is not a valid BIP-340 public key"));
+        if nostr::secp256k1::XOnlyPublicKey::from_slice(&hex::decode(owner).unwrap_or_default())
+            .is_err()
+        {
+            return Err("oa[0] is not a valid BIP-340 public key".to_string());
         }
         // Validate oa[0] is a valid BIP-340 x-only public key (not just hex)
         PublicKey::from_hex(owner)
-            .map_err(|_e| format!("oa[0] is not a valid BIP-340 public key"))?;
+            .map_err(|_e| "oa[0] is not a valid BIP-340 public key".to_string())?;
 
         // Self-attestation is meaningless — owner must differ from signer
         if owner == pk {
@@ -1942,7 +1944,8 @@ Initial commit"
     #[test]
     fn test_read_bounded_file_rejects_missing() {
         let result = read_bounded_file("/nonexistent/path", 1024);
-        println!("{:?}", result); assert!(result.is_err());
+        println!("{:?}", result);
+        assert!(result.is_err());
     }
 
     #[test]
@@ -2073,7 +2076,8 @@ Initial commit"
         let armored = sign_payload(secret, &payload, 1700000000);
         let wrong_payload = b"wrong payload";
         let result = verify_sig(&armored, wrong_payload);
-        println!("{:?}", result); assert!(result.is_err());
+        println!("{:?}", result);
+        assert!(result.is_err());
         assert!(result
             .unwrap_err()
             .contains("signature verification failed"));
@@ -2088,7 +2092,8 @@ Initial commit"
         let tampered = armored.replace(&armored.lines().nth(1).unwrap()[..10], "AAAAAAAAAA");
         // This should either fail to parse or fail verification
         let result = verify_sig(&tampered, &payload);
-        println!("{:?}", result); assert!(result.is_err());
+        println!("{:?}", result);
+        assert!(result.is_err());
     }
 
     #[test]
@@ -2114,7 +2119,8 @@ Initial commit"
         .concat();
         let armored = armor(json.as_bytes());
         let result = verify_sig(&armored, &payload);
-        println!("{:?}", result); assert!(result.is_err());
+        println!("{:?}", result);
+        assert!(result.is_err());
     }
 
     #[test]

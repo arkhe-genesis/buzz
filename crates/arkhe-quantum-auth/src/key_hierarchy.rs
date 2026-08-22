@@ -1,10 +1,10 @@
 //! Hierarchical key derivation for Fast/Slow Path separation.
 
-use alloc::vec::Vec;
-use zeroize::{Zeroize, ZeroizeOnDrop};
 use crate::error::{AuthError, AuthResult};
+use alloc::vec::Vec;
 use hkdf::Hkdf;
 use sha3::Sha3_256;
+use zeroize::{Zeroize, ZeroizeOnDrop};
 
 #[derive(Clone, Zeroize, ZeroizeOnDrop)]
 pub struct KeyHierarchy {
@@ -37,7 +37,8 @@ impl KeyHierarchy {
     }
 
     pub fn rotate_burst(&mut self) -> AuthResult<()> {
-        self.burst_counter = self.burst_counter
+        self.burst_counter = self
+            .burst_counter
             .checked_add(1)
             .ok_or(AuthError::CounterExhausted)?;
 
@@ -52,7 +53,8 @@ impl KeyHierarchy {
     }
 
     pub fn rotate_session(&mut self) -> AuthResult<()> {
-        self.session_counter = self.session_counter
+        self.session_counter = self
+            .session_counter
             .checked_add(1)
             .ok_or(AuthError::CounterExhausted)?;
 
@@ -74,7 +76,8 @@ impl KeyHierarchy {
     }
 
     pub fn tick(&mut self) -> AuthResult<[u8; 12]> {
-        self.msg_counter = self.msg_counter
+        self.msg_counter = self
+            .msg_counter
             .checked_add(1)
             .ok_or(AuthError::CounterExhausted)?;
 
@@ -99,8 +102,7 @@ impl KeyHierarchy {
 
 fn hkdf_expand(prk: &[u8], info: &[u8], okm: &mut [u8]) -> AuthResult<()> {
     let hk = Hkdf::<Sha3_256>::new(None, prk);
-    hk.expand(info, okm)
-        .map_err(|_| AuthError::KeyDerivation)
+    hk.expand(info, okm).map_err(|_| AuthError::KeyDerivation)
 }
 
 fn make_info_string(domain: &str, counter: u64) -> Vec<u8> {

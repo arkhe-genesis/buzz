@@ -1,6 +1,5 @@
 //! Fast Path: herald message authentication at line rate.
 
-use alloc::vec::Vec;
 use zeroize::{Zeroize, ZeroizeOnDrop};
 
 use crate::error::AuthResult;
@@ -73,19 +72,19 @@ pub struct FastPathAuth<A: FastAead> {
 
 impl<A: FastAead> FastPathAuth<A> {
     pub fn new(key_hierarchy: KeyHierarchy, aead: A) -> Self {
-        Self { key_hierarchy, aead }
+        Self {
+            key_hierarchy,
+            aead,
+        }
     }
 
     pub fn seal_herald(&mut self, msg: &mut HeraldMessage) -> AuthResult<()> {
         let nonce = self.key_hierarchy.tick()?;
         let aad = msg.aad();
         let mut plaintext = [];
-        let tag = self.aead.seal(
-            self.key_hierarchy.burst_key(),
-            &nonce,
-            &aad,
-            &mut plaintext,
-        );
+        let tag = self
+            .aead
+            .seal(self.key_hierarchy.burst_key(), &nonce, &aad, &mut plaintext);
         msg.auth_tag = tag;
         Ok(())
     }

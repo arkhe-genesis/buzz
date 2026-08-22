@@ -2,22 +2,22 @@
 // Timechain (Arkhe) — Ledger Topológico Quântico
 // ============================================================================
 
-pub mod mhd;
-pub mod shadow;
-pub mod observer;
-pub mod timechain;
-pub mod retro;
-pub mod storage;
-pub mod network;
 pub mod consensus;
+pub mod mhd;
+pub mod network;
+pub mod observer;
+pub mod retro;
+pub mod shadow;
+pub mod storage;
+pub mod timechain;
 pub mod utxo;
 
 pub use mhd::{EvoField, PlasmaConfig, ReconnectionDetector};
-pub use shadow::{Shadow, ShadowHealer};
 pub use observer::ObserverState;
-pub use timechain::{TimeBlock, ChernSimonsOracle};
 pub use retro::{EchoSignal, RetroCausalChannel};
-pub use storage::{ShadowStore, ShadowSnapshot};
+pub use shadow::{Shadow, ShadowHealer};
+pub use storage::{ShadowSnapshot, ShadowStore};
+pub use timechain::{ChernSimonsOracle, TimeBlock};
 
 pub const CHERN_SIMONS_KAPPA: f64 = 1.0;
 pub const DEFAULT_VALIDATION_TOLERANCE: f64 = 1e-3;

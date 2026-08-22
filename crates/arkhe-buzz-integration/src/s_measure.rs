@@ -116,7 +116,7 @@ mod tests {
         let i = dvector![0.3, 0.4, 0.5];
         let r = DMatrix::from_row_slice(3, 3, &[1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]);
         let s = s_measure_formal(&d, &i, &r).unwrap();
-        assert!(s >= 0.0 && s <= 1.0);
+        assert!((0.0..=1.0).contains(&s));
     }
 
     #[test]
@@ -130,7 +130,7 @@ mod tests {
     #[test]
     fn test_approximate() {
         let s = s_measure_approximate(0.8, 0.5, 0.2);
-        assert!(s >= 0.0 && s <= 1.0);
+        assert!((0.0..=1.0).contains(&s));
     }
 
     #[test]

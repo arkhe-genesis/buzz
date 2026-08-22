@@ -140,8 +140,8 @@ mod tests {
         let mut barrier = SafetyBarrier::new(0.3);
         let t1 = barrier.adaptive_threshold(0.1, 5.0, 0.0);
         let t2 = barrier.adaptive_threshold(0.4, 5.0, 0.0);
-        assert!(t1 >= 0.05 && t1 <= 0.95);
-        assert!(t2 >= 0.05 && t2 <= 0.95);
+        assert!((0.05..=0.95).contains(&t1));
+        assert!((0.05..=0.95).contains(&t2));
         // Higher S should trigger more conservative threshold
         assert!(t2 >= t1);
     }
