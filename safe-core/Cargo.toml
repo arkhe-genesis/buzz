@@ -4,6 +4,7 @@ members = [
     "crates/safe-core-identity",
     "crates/safe-core-governance",
     "crates/safe-core-pea",
+    "crates/dream-evidence-core",
     "crates/safe-core-inference",
     "crates/safe-core-mcp-adapter",
     # Binários (se houver)

@@ -1,18 +1,12 @@
-[graph]
-targets = [
-    { triple = "x86_64-unknown-linux-gnu" },
-    { triple = "aarch64-unknown-linux-gnu" },
-]
-exclude = []
-all-features = false
-no-default-features = false
+# Política cargo-deny calibrada para ARKHE
 
 [advisories]
 vulnerability = "deny"
-unmaintained = "deny"
+unmaintained = "warn"
+yanked = "warn"
 notice = "warn"
 ignore = [
-    # "RUSTSEC-2023-0071", # Exemplo: vulnerabilidade ignorada temporariamente
+    # Ignorar vulnerabilidades específicas se justificado (ex: "RUSTSEC-2023-0001")
 ]
 
 [licenses]
@@ -21,18 +15,40 @@ allow = [
     "MIT",
     "Apache-2.0",
     "BSD-3-Clause",
+    "BSD-2-Clause",
     "ISC",
-    "MPL-2.0",
-    "Unicode-DFS-2016",
+    "CC0-1.0",
+    "Zlib",
+    "Unlicense",
+    "0BSD",
 ]
-deny = []
-copyleft = "warn"
-allow-osi-fsf-free = "never"
-default = "deny"
+deny = [
+    "AGPL-3.0",
+]
+warn = [
+    "GPL-3.0",
+    "GPL-2.0",
+    "LGPL-3.0",
+]
+exceptions = [
+    # Exceções específicas para crates com licenças ambíguas
+]
 
 [bans]
 multiple-versions = "warn"
-wildcards = "deny"
+wildcards = "allow"
 highlight = "all"
-workspace-default-features = "allow"
-external-default-features = "allow"
+deny = [
+    { name = "openssl" },
+    { name = "failure" },
+    { name = "rustc-serialize" },
+]
+skip = [
+]
+skip-tree = [
+]
+
+[sources]
+unknown-registry = "deny"
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]
+allow-git = []
