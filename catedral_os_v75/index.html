@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Catedral OS — Visualizador de Campos Epistêmicos</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+    <style>
+        body { margin: 0; overflow: hidden; background: #0a0a0a; color: #fff;
+               font-family: 'Courier New', monospace; }
+        #info { position: absolute; top: 10px; left: 10px; z-index: 100;
+                background: rgba(0,0,0,0.7); padding: 15px; border-radius: 8px;
+                border: 1px solid #333; font-size: 13px; line-height: 1.6; }
+        #metrics { position: absolute; bottom: 10px; right: 10px; z-index: 100;
+                   background: rgba(0,0,0,0.7); padding: 15px; border-radius: 8px;
+                   border: 1px solid #333; font-size: 12px; }
+        h3 { margin: 0 0 10px 0; color: #64ffda; font-size: 14px; }
+        .label { color: #888; }
+        .value { color: #64ffda; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div id="info">
+        <h3>🏛️ CATEDRAL OS v7.5</h3>
+        <div><span class="label">Equação:</span> Arkhe(n) ≡ Microtúbulo ≡ Clareira</div>
+        <div><span class="label">Substratos:</span> 163 → 191 (29 camadas)</div>
+        <div><span class="label">Controle:</span> Clique para adicionar partícula</div>
+    </div>
+    <div id="metrics">
+        <div><span class="label">Iterações:</span> <span class="value" id="m-iter">0</span></div>
+        <div><span class="label">Bloqueados:</span> <span class="value" id="m-block">0</span></div>
+        <div><span class="label">Sucessos:</span> <span class="value" id="m-success">0</span></div>
+    </div>
+    <script>
+        let particles = [];
+        let vectorField = [];
+        let alpha = 0.3;
+
+        function setup() {
+            createCanvas(windowWidth, windowHeight);
+            for (let i = 0; i < 500; i++) particles.push(new Particle());
+            fetchField();
+            setInterval(fetchField, 3000);
+            setInterval(fetchMetrics, 2000);
+        }
+
+        function fetchField() {
+            fetch('/api/vector_field')
+                .then(r => r.json())
+                .then(data => { vectorField = data; })
+                .catch(() => {});
+        }
+
+        function fetchMetrics() {
+            fetch('/api/metrics')
+                .then(r => r.json())
+                .then(data => {
+                    document.getElementById('m-iter').textContent = data.iterations || 0;
+                    document.getElementById('m-block').textContent = data.blocked || 0;
+                    document.getElementById('m-success').textContent = data.success || 0;
+                })
+                .catch(() => {});
+        }
+
+        function draw() {
+            background(10, 10, 15, 30);
+            for (let p of particles) { p.update(); p.show(); }
+        }
+
+        function getVectorAt(x, y) {
+            if (vectorField.length === 0) return {vx: 0, vy: 0};
+            let nx = (x / width) * 2 - 1;
+            let ny = (y / height) * 2 - 1;
+            let closest = vectorField[0], minD = Infinity;
+            for (let v of vectorField) {
+                let d = dist(nx, ny, v.x, v.y);
+                if (d < minD) { minD = d; closest = v; }
+            }
+            return closest;
+        }
+
+        class Particle {
+            constructor() {
+                this.reset();
+                this.history = [];
+            }
+            reset() {
+                this.x = random(width);
+                this.y = random(height);
+                this.life = 255;
+                this.hue = random(150, 200);
+            }
+            update() {
+                let v = getVectorAt(this.x, this.y);
+                this.x += v.vx * 4;
+                this.y += v.vy * 4;
+                this.history.push({x: this.x, y: this.y});
+                if (this.history.length > 40) this.history.shift();
+                this.life -= 0.3;
+                if (this.x < 0 || this.x > width || this.y < 0 || this.y > height || this.life < 0) {
+                    this.reset();
+                    this.history = [];
+                }
+            }
+            show() {
+                noFill();
+                for (let i = 0; i < this.history.length - 1; i++) {
+                    let a = map(i, 0, this.history.length, 0, 120);
+                    stroke(100, 200, 255, a);
+                    line(this.history[i].x, this.history[i].y,
+                         this.history[i+1].x, this.history[i+1].y);
+                }
+            }
+        }
+
+        function mousePressed() {
+            for (let i = 0; i < 10; i++) {
+                let p = new Particle();
+                p.x = mouseX + random(-20, 20);
+                p.y = mouseY + random(-20, 20);
+                particles.push(p);
+            }
+        }
+
+        function windowResized() { resizeCanvas(windowWidth, windowHeight); }
+    </script>
+</body>
+</html>
