@@ -273,6 +273,30 @@ def main():
     mcp = MCPClient()
     mcp.connect()
 
+    # Inicializa novos substratos (237-239)
+    try:
+        import sys
+        sys.path.append(os.path.join(os.path.dirname(__file__), 'substrates'))
+        from substrate_237 import PlasmaRailgunSubstrate
+        from substrate_238 import SupersonicPlasmaJetSubstrate
+        from substrate_239 import KiloteslaMagnetSubstrate
+
+        # Substrato 237
+        sub237 = PlasmaRailgunSubstrate(core.prolog)
+        sub237.set_wormgraph(wormgraph)
+
+        # Substrato 238
+        sub238 = SupersonicPlasmaJetSubstrate(core.prolog)
+        sub238.set_wormgraph(wormgraph)
+
+        # Substrato 239
+        sub239 = KiloteslaMagnetSubstrate(core.prolog)
+        sub239.set_wormgraph(wormgraph)
+
+        logger.info("Substratos 237, 238, 239 carregados com sucesso.")
+    except Exception as e:
+        logger.error(f"Falha ao carregar novos substratos: {e}")
+
     # Configura handler
     CathedralHandler.core = core
     CathedralHandler.wormgraph = wormgraph
@@ -282,7 +306,7 @@ def main():
     wormgraph.commit({
         "event": "cathedral_init",
         "version": "7.5",
-        "substrates": list(range(163, 192))
+        "substrates": list(range(163, 192)) + [237, 238, 239]
     })
 
     # Inicia servidor HTTP
