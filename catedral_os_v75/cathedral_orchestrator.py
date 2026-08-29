@@ -280,6 +280,7 @@ def main():
         from substrate_237 import PlasmaRailgunSubstrate
         from substrate_238 import SupersonicPlasmaJetSubstrate
         from substrate_239 import KiloteslaMagnetSubstrate
+        from substrate_271 import THEORIES, compare_theories
 
         # Substrato 237
         sub237 = PlasmaRailgunSubstrate(core.prolog)
@@ -293,7 +294,7 @@ def main():
         sub239 = KiloteslaMagnetSubstrate(core.prolog)
         sub239.set_wormgraph(wormgraph)
 
-        logger.info("Substratos 237, 238, 239 carregados com sucesso.")
+        logger.info("Substratos 237, 238, 239, 271 carregados com sucesso.")
     except Exception as e:
         logger.error(f"Falha ao carregar novos substratos: {e}")
 
@@ -306,7 +307,7 @@ def main():
     wormgraph.commit({
         "event": "cathedral_init",
         "version": "7.5",
-        "substrates": list(range(163, 192)) + [237, 238, 239]
+        "substrates": list(range(163, 192)) + [237, 238, 239, 271]
     })
 
     # Inicia servidor HTTP
